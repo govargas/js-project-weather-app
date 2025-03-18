@@ -81,26 +81,30 @@ const fetchWeatherData = () => __awaiter(void 0, void 0, void 0, function* () {
     loadWeatherData(weatherData);
 });
 // LOAD LANDING PAGE DATA
-const loadWeatherData = (data) => {
-    container.innerHTML = `
-    <div class="landing-page-container">
-      <div class="image-container">
-        <img src="" alt="">
-      </div>
-      <h1>${data.list[0].main.temp}</h1>
+container.innerHTML = `
+  <div class="landing-page-container">
+    <div class="image-container">
+      <img id="weather-icon" src="./assets/sunny.svg" alt="Weather Icon">
+    </div>
+    <div class=weather-info>
+      <h1>${weatherData.main.temp}</h1>
       <h2>City</h2>
       <h3>Weather</h3>
-      <div class="sunrise-sunset">
-        <div class="sunrise-container">
-          <p>Sunrise</p>
-          <p>Time</p>
-        </div>
-        <div class="sunset-container">
-          <p>Sunset</p>
-          <p>Time</p>
-        </div>
+    </div>
+    <div class="sunrise-sunset">
+      <div class="sunrise-container">
+        <p>Sunrise</p>
+        <p>Time</p>
       </div>
-      <button>&#x3e;</button>
-    </div>`;
-};
-document.addEventListener("DOMContentLoaded", fetchWeatherData);
+      <div class="sunset-container">
+        <p>Sunset</p>
+        <p>Time</p>
+      </div>
+    </div>
+    <button class="icon-button">
+      <img src="assets/button.svg" alt="Button Icon">
+    </button>
+  </div>`;
+// tsc file.ts 
+// tsc file.ts --outFile file.js
+// tsc --init

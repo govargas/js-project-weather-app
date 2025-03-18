@@ -87,7 +87,7 @@ const loadWeatherData = (data: any) => {
   container.innerHTML = `
   <div class="landing-page-container">
     <div class="image-container">
-      <img id="weather-icon" src="./assets/sunny.svg" alt="Weather Icon">
+      <img id="weather-icon" class="weather-icon"src="./assets/sunny.svg" alt="Weather Icon">
     </div>
     <div class=weather-info>
       <h1>${data.list[0].main.temp}</h1>
