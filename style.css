@@ -131,3 +131,6 @@ body {
 .navbar li:last-child {
   border-bottom: none;
 }
+body {
+  background: linear-gradient(135deg, #8589FF, #E8E9FF);
+}
