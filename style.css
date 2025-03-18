@@ -131,6 +131,22 @@ body {
 .navbar li:last-child {
   border-bottom: none;
 }
+* {
+  box-sizing: border-box;
+}
+
 body {
+  margin: 2rem;
+  font-family: 'Roboto', sans-serif;
+  color: #fff;
+  background: linear-gradient(90deg, #8589FF, #E8E9FF);
+}
+
+.daytime {
   background: linear-gradient(135deg, #8589FF, #E8E9FF);
+}
+
+.nighttime {
+  background: linear-gradient(270deg, #6264A2, #222350);
+  ;
 }
