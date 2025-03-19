@@ -104,3 +104,45 @@ const loadWeatherData = (data) => {
     </div>`;
 };
 document.addEventListener("DOMContentLoaded", fetchWeatherData);
+// LOAD MAIN PAGE
+const loadMainPage = (data) => {
+    const date = new Date(data.dt * 1000);
+    const day = date.getDay();
+    const days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+    ];
+    container.innerHTML = `
+  <div class="main-content-container">
+        <div class="main-content-hero">
+          <img>
+          <h1>${data.main.temp}</h1>
+          <h2>${data.name}</h2>
+          <h3>${data.weather[0].main}</h3>
+          <div class="main-sunrise-sunset">
+            <div class="main-sunrise-container">
+              <p>Sunrise</p>
+              <p>${data.sys.sunrise}</p>
+            </div>
+            <div class="main-sunset-container">
+              <p>Sunset</p>
+              <p>${data.sys.sunset}</p>
+            </div>
+        </div>
+      </div>
+      <button class="main-content-btn">></button>
+        <div class="main-temp-table">
+          <div class="main-temp-table-row">
+            <div class="main-temp-table-day">${days[day]}</div>
+            <div class="main-temp-table-img"><img></div>
+            <div class="main-temp-table-temp">26/12</div>
+          </div>
+        </div>
+    </div>
+  `;
+};
