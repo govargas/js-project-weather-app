@@ -105,33 +105,45 @@ const weatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${
     const currentHour: number = getLocalHours(weatherData.dt)
     const sunriseHour: number = getLocalHours(weatherData.sys.sunrise)
     const sunsetHour: number = getLocalHours(weatherData.sys.sunset)
-
-    const isDaytime: boolean = currentHour >= sunriseHour && currentHour < sunsetHour
-
-    document.body.classList.add(isDaytime ? "daytime" : "nighttime")
-
-    console.log(`Current Hour: ${currentHour}, Sunrise Hour: ${sunriseHour}, Sunset Hour: ${sunsetHour}`)
-  }
-
-  // Fetch API
-  const fetchWeatherData = async () => {
-    try {
-      const response = await fetch(weatherURL);
-      const data = await response.json();
-      console.log(data);
-
-      weatherData = data;
-      loadWeatherData(weatherData);
-      updatePageStyle(weatherData)
-
-    } catch (error) {
-      console.error("Something went wrong", error)
+    // Unix to Time of Day Function
+    const getLocalHours = (unixTime: number) => {
+      return new Date(unixTime * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
     }
-  };
+    // Style Page by Time of Day (ToD)
+    const updatePageStyle = () => {
+      const currentHour: string = getLocalHours(weatherData.dt)
+      const sunriseHour: string = getLocalHours(weatherData.sys.sunrise)
+      const sunsetHour: string = getLocalHours(weatherData.sys.sunset)
 
-  // LOAD LANDING PAGE DATA
-  const loadWeatherData = () => {
-    container.innerHTML += `
+      const isDaytime: boolean = currentHour >= sunriseHour && currentHour < sunsetHour
+
+      document.body.classList.add(isDaytime ? "daytime" : "nighttime")
+
+      console.log(`Current Hour: ${currentHour}, Sunrise Hour: ${sunriseHour}, Sunset Hour: ${sunsetHour}`)
+    }
+
+    // Fetch API
+    const fetchWeatherData = async () => {
+      try {
+        const response = await fetch(weatherURL);
+        const data = await response.json();
+        console.log(data);
+
+        weatherData = data;
+        loadWeatherData(weatherData);
+        updatePageStyle(weatherData)
+        weatherData = data;
+        loadWeatherData(weatherData);
+        updatePageStyle()
+
+      } catch (error) {
+        console.error("Something went wrong", error)
+      }
+    };
+
+    // LOAD LANDING PAGE DATA
+    const loadWeatherData = () => {
+      container.innerHTML += `
   <div class="landing-page-container">
     <div class="image-container">
       <img id="weather-icon" class="weather-icon" src="./assets/sunny.svg" alt="Weather Icon">
@@ -147,36 +159,36 @@ const weatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${
     <div class="sunrise-sunset">
       <div class="sunrise-container">
         <p><b>Sunrise</b></p>
-        <p>${new Date(weatherData.sys.sunrise * 1000).toLocaleTimeString()}</p>
+        <p>${getLocalHours(weatherData.sys?.sunrise)}</p>
       </div>
       <div class="sunset-container">
         <p>Sunset</p>
-        <p>${new Date(weatherData.sys.sunset * 1000).toLocaleTimeString()}/p>
+        <p>${getLocalHours(weatherData.sys?.sunset)}</p>
       </div>
     </div>
     <button class="icon-button">
       <img src="assets/button.svg" alt="Button Icon">
     </button>
   </div>`
-  };
+    };
 
-  document.addEventListener("DOMContentLoaded", fetchWeatherData);
+    document.addEventListener("DOMContentLoaded", fetchWeatherData);
 
-  // LOAD MAIN PAGE
-  const loadMainPage = (data: any) => {
-    const date = new Date(data.dt * 1000);
-    const day = date.getDay();
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
+    // LOAD MAIN PAGE
+    const loadMainPage = (data: any) => {
+      const date = new Date(data.dt * 1000);
+      const day = date.getDay();
+      const days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
 
-    container.innerHTML = `
+      container.innerHTML = `
   <div class="main-content-container">
         <div class="main-content-hero">
           <img>
@@ -204,20 +216,20 @@ const weatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${
         </div>
     </div>
   `;
-  };
+    };
 
-  // HAMBURGER MENU TOGGLE
+    // HAMBURGER MENU TOGGLE
 
-  // Select the hamburger menu and navbar elements
-  const menuIcon = document.getElementById("menu-icon")!;
-  const navbar = document.querySelector(".navbar")!;
+    // Select the hamburger menu and navbar elements
+    const menuIcon = document.getElementById("menu-icon")!;
+    const navbar = document.querySelector(".navbar")!;
 
-  // Toggle the navbar when the menu icon is clicked
-  menuIcon.addEventListener("click", () => {
-    menuIcon.classList.toggle("open");
-    navbar.classList.toggle("open");
-  });
+    // Toggle the navbar when the menu icon is clicked
+    menuIcon.addEventListener("click", () => {
+      menuIcon.classList.toggle("open");
+      navbar.classList.toggle("open");
+    });
 
-}
+  }
 
-fetchWeatherData()
+  fetchWeatherData()
