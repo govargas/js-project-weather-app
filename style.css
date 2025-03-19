@@ -64,7 +64,9 @@ body {
 .weather-icon {
   width: 10rem; 
   height: 10rem;
-}/* Hamburger Menu */
+}
+
+/* Hamburger Menu */
 .menu-icon {
   display: flex;
   flex-direction: column;
