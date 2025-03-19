@@ -76,20 +76,18 @@ const fetchWeatherData = async (): Promise<void> => {
   const data = await response.json();
   console.log(data);
   weatherData = data;
-
   console.log(weatherData);
 
   loadWeatherData(weatherData);
-  loadMainPage(weatherData);
 };
 
-// LOAD MAIN PAGE
+// // LOAD LANDING PAGE DATA
 
 const loadWeatherData = (data: any) => {
   container.innerHTML = `
   <div class="landing-page-container">
     <div class="image-container">
-      <img id="weather-icon" class="weather-icon"src="./assets/sunny.svg" alt="Weather Icon">
+      <img id="weather-icon" class="weather-icon" src="./assets/sunny.svg" alt="Weather Icon">
     </div>
     <div class=weather-info>
       <h1>${data.list[0].main.temp}</h1>
@@ -116,21 +114,8 @@ document.addEventListener("DOMContentLoaded", fetchWeatherData);
 
 // LOAD MAIN PAGE
 const loadMainPage = (data: any) => {
-  const sunriseTime = new Date(data.city.sunrise * 1000).toLocaleTimeString(
-    "en-GB",
-    {
-      hour: "2-digit",
-      minute: "2-digit",
-    }
-  );
-  const sunsetTime = new Date(data.city.sunset * 1000).toLocaleTimeString(
-    "en-GB",
-    {
-      hour: "2-digit",
-      minute: "2-digit",
-    }
-  );
-
+  const date = new Date(data.dt * 1000);
+  const day = date.getDay();
   const days = [
     "Sunday",
     "Monday",
@@ -141,48 +126,44 @@ const loadMainPage = (data: any) => {
     "Saturday",
   ];
 
-  const tempTableRows = data.list
-    .map((dayData: any) => {
-      const dayDate = new Date(dayData.dt * 1000);
-      const dayName = days[dayDate.getDay()];
-      const minTemp = dayData.main.temp_min;
-      const maxTemp = dayData.main.temp_max;
-      const weatherIcon = dayData.weather[0].icon;
-
-      return `
-    <div class="main-temp-table-row">
-        <div class="main-temp-table-day">${dayName}</div>
-        <div class="main-temp-table-img"><img src="https://openweathermap.org/img/wn/${weatherIcon}.png" alt="${dayData.weather[0].description}"></div>
-        <div class="main-temp-table-temp">${minTemp} / ${maxTemp}°C</div>
-      </div>
-    `;
-    })
-    .join("");
-
   container.innerHTML = `
   <div class="main-content-container">
         <div class="main-content-hero">
           <img>
-          <h1>${data.list[0].main.temp}°C</h1>
-          <h2>${data.city.name}</h2>
-          <h3>${data.list[0].weather[0].main}</h3>
+          <h1>${data.main.temp}</h1>
+          <h2>${data.name}</h2>
+          <h3>${data.weather[0].main}</h3>
           <div class="main-sunrise-sunset">
             <div class="main-sunrise-container">
               <p>Sunrise</p>
-              <p>${sunriseTime}</p>
+              <p>${data.sys.sunrise}</p>
             </div>
             <div class="main-sunset-container">
               <p>Sunset</p>
-              <p>${sunsetTime}</p>
+              <p>${data.sys.sunset}</p>
             </div>
         </div>
       </div>
       <button class="main-content-btn">></button>
         <div class="main-temp-table">
           <div class="main-temp-table-row">
-            ${tempTableRows}
+            <div class="main-temp-table-day">${days[day]}</div>
+            <div class="main-temp-table-img"><img></div>
+            <div class="main-temp-table-temp">26/12</div>
           </div>
         </div>
     </div>
   `;
 };
+
+// HAMBURGER MENU TOGGLE
+
+// Select the hamburger menu and navbar elements
+const menuIcon = document.getElementById("menu-icon")!;
+const navbar = document.querySelector(".navbar")!;
+
+// Toggle the navbar when the menu icon is clicked
+menuIcon.addEventListener("click", () => {
+  menuIcon.classList.toggle("open");
+  navbar.classList.toggle("open");
+});
