@@ -1,4 +1,12 @@
 "use strict";
+// WEATHER DATA INTERFACE
+// interface WeatherData {
+//   city: City;
+//   cod: string;
+//   message: number;
+//   cnt: number;
+//   list: DailyForecast[];
+// }
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,19 +16,68 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
+// type City = {
+//   id: number;
+//   name: string;
+//   coord: Coordinates;
+//   country: string;
+//   population: number;
+//   timezone: number;
+// };
+// type Coordinates = {
+//   lon: number;
+//   lat: number;
+// };
+// type DailyForecast = {
+//   dt: number;
+//   sunrise: number;
+//   sunset: number;
+//   temp: Temperature;
+//   feels_like: FeelsLike;
+//   pressure: number;
+//   humidity: number;
+//   weather: Weather[];
+//   speed: number;
+//   deg: number;
+//   gust: number;
+//   clouds: number;
+//   pop: number;
+//   rain: number;
+// };
+// type Temperature = {
+//   day: number;
+//   min: number;
+//   max: number;
+//   night: number;
+//   eve: number;
+//   morn: number;
+// };
+// type FeelsLike = {
+//   day: number;
+//   night: number;
+//   eve: number;
+//   morn: number;
+// };
+// type Weather = {
+//   id: number;
+//   main: string;
+//   description: string;
+//   icon: string;
+// };
+const APIKey = "31ef2747a161bbc841cc049ca29ffc97";
 // SELECTORS
 const container = document.querySelector(".container");
-const APIKey = "2259f103ffcc8ead06b941ec5efcf06e";
 let city = "stockholm";
 let weatherData;
-const weatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
+// const weatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
+const weatherURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=5&units=metric&appid=${APIKey}`;
 // FETCH WEATHER
 const fetchWeatherData = () => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield fetch(weatherURL);
     const data = yield response.json();
     console.log(data);
     weatherData = data;
+    console.log(weatherData);
     loadWeatherData(weatherData);
 });
 // LOAD LANDING PAGE DATA
@@ -30,7 +87,7 @@ const loadWeatherData = (data) => {
       <div class="image-container">
         <img src="" alt="">
       </div>
-      <h1>${data.main.temp}</h1>
+      <h1>${data.list[0].main.temp}</h1>
       <h2>City</h2>
       <h3>Weather</h3>
       <div class="sunrise-sunset">
