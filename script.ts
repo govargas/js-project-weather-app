@@ -60,6 +60,7 @@
 //   description: string;
 //   icon: string;
 // };
+
 const APIKey: string = "31ef2747a161bbc841cc049ca29ffc97";
 
 // SELECTORS
@@ -83,27 +84,32 @@ const fetchWeatherData = async (): Promise<void> => {
 };
 
 // LOAD MAIN PAGE
+
 const loadWeatherData = (data: any) => {
   container.innerHTML = `
-    <div class="landing-page-container">
-      <div class="image-container">
-        <img src="" alt="">
-      </div>
+  <div class="landing-page-container">
+    <div class="image-container">
+      <img id="weather-icon" class="weather-icon"src="./assets/sunny.svg" alt="Weather Icon">
+    </div>
+    <div class=weather-info>
       <h1>${data.list[0].main.temp}</h1>
       <h2>City</h2>
       <h3>Weather</h3>
-      <div class="sunrise-sunset">
-        <div class="sunrise-container">
-          <p>Sunrise</p>
-          <p>Time</p>
-        </div>
-        <div class="sunset-container">
-          <p>Sunset</p>
-          <p>Time</p>
-        </div>
+    </div>
+    <div class="sunrise-sunset">
+      <div class="sunrise-container">
+        <p>Sunrise</p>
+        <p>Time</p>
       </div>
-      <button>&#x3e;</button>
-    </div>`;
+      <div class="sunset-container">
+        <p>Sunset</p>
+        <p>Time</p>
+      </div>
+    </div>
+    <button class="icon-button">
+      <img src="assets/button.svg" alt="Button Icon">
+    </button>
+  </div>`
 };
 
 document.addEventListener("DOMContentLoaded", fetchWeatherData);

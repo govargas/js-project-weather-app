@@ -81,30 +81,38 @@ const fetchWeatherData = () => __awaiter(void 0, void 0, void 0, function* () {
     loadWeatherData(weatherData);
     loadMainPage(weatherData);
 });
+
 // LOAD MAIN PAGE
 const loadWeatherData = (data) => {
     container.innerHTML = `
     <div class="landing-page-container">
       <div class="image-container">
-        <img src="" alt="">
+        <img id="weather-icon" src="./assets/sunny.svg" alt="Weather Icon">
       </div>
+    <div class="weather-info">
       <h1>${data.list[0].main.temp}</h1>
       <h2>City</h2>
       <h3>Weather</h3>
-      <div class="sunrise-sunset">
-        <div class="sunrise-container">
-          <p>Sunrise</p>
-          <p>Time</p>
-        </div>
-        <div class="sunset-container">
-          <p>Sunset</p>
-          <p>Time</p>
-        </div>
+    </div>
+    <div class="sunrise-sunset">
+      <div class="sunrise-container">
+        <p>Sunrise</p>
+        <p>Time</p>
       </div>
-      <button>&#x3e;</button>
+      <div class="sunset-container">
+        <p>Sunset</p>
+        <p>Time</p>
+      </div>
+    </div>
+    <button class="icon-button">
+      <img src="assets/button.svg" alt="Button Icon">
+    </button>
+    </div>`;
     </div>`;
 };
+
 document.addEventListener("DOMContentLoaded", fetchWeatherData);
+
 // LOAD MAIN PAGE
 const loadMainPage = (data) => {
     const sunriseTime = new Date(data.city.sunrise * 1000).toLocaleTimeString("en-GB", {
