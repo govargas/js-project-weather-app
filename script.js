@@ -1,31 +1,106 @@
-// Selectors
-var container = document.querySelector(".container");
-var APIKey = "2259f103ffcc8ead06b941ec5efcf06e";
-var city = "stockholm";
-var weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=".concat(city, "&units=metric&appid=").concat(APIKey);
-// Data reference
-var weatherData = {
-    "coord": { "lon": 18.0649, "lat": 59.3326 },
-    "weather": [{ "id": 800, "main": "Clear", "description": "clear sky", "icon": "01d" }], "base": "stations",
-    "main": { "temp": 281.33,
-        "feels_like": 278.02,
-        "temp_min": 281.01,
-        "temp_max": 281.62,
-        "pressure": 1020,
-        "humidity": 55,
-        "sea_level": 1020,
-        "grnd_level": 1015 },
-    "visibility": 10000,
-    "wind": { "speed": 6.17, "deg": 290 },
-    "clouds": { "all": 0 },
-    "dt": 1742292721,
-    "sys": { "type": 1, "id": 1788, "country": "SE",
-        "sunrise": 1742273722,
-        "sunset": 1742316975 },
-    "timezone": 3600,
-    "id": 2673730,
-    "name": "Stockholm",
-    "cod": 200
+"use strict";
+// WEATHER DATA INTERFACE
+// interface WeatherData {
+//   city: City;
+//   cod: string;
+//   message: number;
+//   cnt: number;
+//   list: DailyForecast[];
+// }
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
+// type City = {
+//   id: number;
+//   name: string;
+//   coord: Coordinates;
+//   country: string;
+//   population: number;
+//   timezone: number;
+// };
+// type Coordinates = {
+//   lon: number;
+//   lat: number;
+// };
+// type DailyForecast = {
+//   dt: number;
+//   sunrise: number;
+//   sunset: number;
+//   temp: Temperature;
+//   feels_like: FeelsLike;
+//   pressure: number;
+//   humidity: number;
+//   weather: Weather[];
+//   speed: number;
+//   deg: number;
+//   gust: number;
+//   clouds: number;
+//   pop: number;
+//   rain: number;
+// };
+// type Temperature = {
+//   day: number;
+//   min: number;
+//   max: number;
+//   night: number;
+//   eve: number;
+//   morn: number;
+// };
+// type FeelsLike = {
+//   day: number;
+//   night: number;
+//   eve: number;
+//   morn: number;
+// };
+// type Weather = {
+//   id: number;
+//   main: string;
+//   description: string;
+//   icon: string;
+// };
+const APIKey = "31ef2747a161bbc841cc049ca29ffc97";
+// SELECTORS
+const container = document.querySelector(".container");
+let city = "stockholm";
+let weatherData;
+// const weatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
+const weatherURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=5&units=metric&appid=${APIKey}`;
+// FETCH WEATHER
+const fetchWeatherData = () => __awaiter(void 0, void 0, void 0, function* () {
+    const response = yield fetch(weatherURL);
+    const data = yield response.json();
+    console.log(data);
+    weatherData = data;
+    console.log(weatherData);
+    loadWeatherData(weatherData);
+});
 // LOAD LANDING PAGE DATA
-container.innerHTML = "\n  <div class=\"landing-page-container\">\n    <div class=\"image-container\">\n      <img src=\"\" alt=\"\">\n    </div>\n    <h1>".concat(weatherData.main.temp, "</h1>\n    <h2>City</h2>\n    <h3>Weather</h3>\n    <div class=\"sunrise-sunset\">\n      <div class=\"sunrise-container\">\n        <p>Sunrise</p>\n        <p>Time</p>\n      </div>\n      <div class=\"sunset-container\">\n        <p>Sunset</p>\n        <p>Time</p>\n      </div>\n    </div>\n    <button>&#x3e;</button>\n  </div>");
+const loadWeatherData = (data) => {
+    container.innerHTML = `
+    <div class="landing-page-container">
+      <div class="image-container">
+        <img src="" alt="">
+      </div>
+      <h1>${data.list[0].main.temp}</h1>
+      <h2>City</h2>
+      <h3>Weather</h3>
+      <div class="sunrise-sunset">
+        <div class="sunrise-container">
+          <p>Sunrise</p>
+          <p>Time</p>
+        </div>
+        <div class="sunset-container">
+          <p>Sunset</p>
+          <p>Time</p>
+        </div>
+      </div>
+      <button>&#x3e;</button>
+    </div>`;
+};
+document.addEventListener("DOMContentLoaded", fetchWeatherData);
