@@ -80,7 +80,7 @@ const fetchWeatherData = async (): Promise<void> => {
   loadWeatherData(weatherData);
 };
 
-// LOAD LANDING PAGE DATA
+// LOAD MAIN PAGE
 const loadWeatherData = (data: any) => {
   container.innerHTML = `
     <div class="landing-page-container">

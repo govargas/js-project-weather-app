@@ -7,15 +7,39 @@
 //   cnt: number;
 //   list: DailyForecast[];
 // }
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+var __awaiter =
+  (this && this.__awaiter) ||
+  function (thisArg, _arguments, P, generator) {
+    function adopt(value) {
+      return value instanceof P
+        ? value
+        : new P(function (resolve) {
+            resolve(value);
+          });
+    }
     return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+      function fulfilled(value) {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function rejected(value) {
+        try {
+          step(generator["throw"](value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function step(result) {
+        result.done
+          ? resolve(result.value)
+          : adopt(result.value).then(fulfilled, rejected);
+      }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-};
+  };
 // type City = {
 //   id: number;
 //   name: string;
@@ -72,17 +96,18 @@ let weatherData;
 // const weatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
 const weatherURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=5&units=metric&appid=${APIKey}`;
 // FETCH WEATHER
-const fetchWeatherData = () => __awaiter(void 0, void 0, void 0, function* () {
+const fetchWeatherData = () =>
+  __awaiter(void 0, void 0, void 0, function* () {
     const response = yield fetch(weatherURL);
     const data = yield response.json();
     console.log(data);
     weatherData = data;
     console.log(weatherData);
     loadWeatherData(weatherData);
-});
+  });
 // LOAD LANDING PAGE DATA
 const loadWeatherData = (data) => {
-    container.innerHTML = `
+  container.innerHTML = `
     <div class="landing-page-container">
       <div class="image-container">
         <img src="" alt="">
@@ -106,18 +131,18 @@ const loadWeatherData = (data) => {
 document.addEventListener("DOMContentLoaded", fetchWeatherData);
 // LOAD MAIN PAGE
 const loadMainPage = (data) => {
-    const date = new Date(data.dt * 1000);
-    const day = date.getDay();
-    const days = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-    ];
-    container.innerHTML = `
+  const date = new Date(data.dt * 1000);
+  const day = date.getDay();
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  container.innerHTML = `
   <div class="main-content-container">
         <div class="main-content-hero">
           <img>
