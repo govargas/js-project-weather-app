@@ -1,11 +1,14 @@
-// Selectors
+import { WeatherData } from "./WeatherData";
+
+// SELECTORS
 const container = document.querySelector(".container")!;
 const APIKey: string = "2259f103ffcc8ead06b941ec5efcf06e";
 let city: string = "stockholm";
 let weatherData;
 const weatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
 
-const fetchWeatherData = async (): Promise<any> => {
+// FETCH WEATHER
+const fetchWeatherData = async (): Promise<void> => {
   const response = await fetch(weatherURL);
   const data = await response.json();
   console.log(data);
@@ -13,10 +16,8 @@ const fetchWeatherData = async (): Promise<any> => {
   loadWeatherData(weatherData);
 };
 
-fetchWeatherData();
-
 // LOAD LANDING PAGE DATA
-const loadWeatherData = (data: any) => {
+const loadWeatherData = (data: WeatherData) => {
   container.innerHTML = `
     <div class="landing-page-container">
       <div class="image-container">
@@ -39,6 +40,4 @@ const loadWeatherData = (data: any) => {
     </div>`;
 };
 
-// {"coord":{"lon":18.0649,"lat":59.3326},"weather":[{"id":802,"main":"Clouds","description":"scattered clouds","icon":"03d"}],"base":"stations","main":{"temp":9.21,"feels_like":8.08,"temp_min":8.95,"temp_max":9.58,"pressure":1020,"humidity":56,"sea_level":1020,"grnd_level":1015},"visibility":10000,"wind":{"speed":2.24,"deg":293,"gust":4.02},"clouds":{"all":47},"dt":1742293894,"sys":{"type":2,"id":2012100,"country":"SE","sunrise":1742273722,"sunset":1742316975},"timezone":3600,"id":2673730,"name":"Stockholm","cod":200}
-
-// document.addEventListener("DOMContentLoaded", fetchWeatherData);
+document.addEventListener("DOMContentLoaded", fetchWeatherData);
