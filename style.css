@@ -70,6 +70,9 @@ body {
   flex-direction: column;
   cursor: pointer;
   user-select: none;
+  position: absolute; 
+  top: 20px;  
+  left: 20px;
 }
 
 .menu-icon span {
@@ -92,4 +95,37 @@ body {
 
 .menu-icon.open span:nth-child(3) {
   transform: translateY(-9px) rotate(45deg);
+}
+
+/* Navbar styling */
+.navbar {
+  position: absolute;
+  top: 60px; /* Adjust this if needed based on menu icon height */
+  left: 20px;
+  width: 50vw; /* 50% of the viewport width */
+  background-color: rgba(0, 0, 0, 0.5); /* Black with 50% transparency */
+  color: #fff; 
+  padding: 10px;
+  display: none; /* Hidden by default */
+  border-radius: 5px;
+}
+
+.navbar.open {
+  display: block;
+}
+
+.navbar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navbar li {
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Remove border from last item */
+.navbar li:last-child {
+  border-bottom: none;
 }
