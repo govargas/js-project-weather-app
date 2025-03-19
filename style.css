@@ -64,4 +64,32 @@ body {
 .weather-icon {
   width: 10rem; 
   height: 10rem;
+}/* Hamburger Menu */
+.menu-icon {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  user-select: none;
+}
+
+.menu-icon span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  margin: 3px 0;
+  background: #ffffff;
+  border-radius: 3px;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.menu-icon.open span:nth-child(1) {
+  transform: translateY(9px) rotate(-45deg);
+}
+
+.menu-icon.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-icon.open span:nth-child(3) {
+  transform: translateY(-9px) rotate(45deg);
 }
