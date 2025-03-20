@@ -99,7 +99,7 @@ const oneDayWeatherFetch = () => __awaiter(void 0, void 0, void 0, function* () 
         console.log(data);
         weatherData = data;
         loadWeatherData(weatherData);
-        // fetchWeatherData(); //REMOVE THIS WHEN FINISHED
+        fetchWeatherData(); //REMOVE THIS WHEN FINISHED
         updatePageStyle();
     }
     catch (error) {
@@ -115,7 +115,7 @@ const loadWeatherData = (weatherData) => {
       <img id="weather-icon" class="weather-icon" src="./assets/sunny.svg" alt="Weather Icon">
     </div>
     <div class="weather-info">  
-      <h1>${Math.round(weatherData.main.temp)}°C</h1>
+      <h1 class="big-temp">${Math.round(weatherData.main.temp)}<sup class="big-temp-degrees">°C</sup></h1>
       <h2>${weatherData.name}</h2>
       <h3>${weatherData.weather[0].description}</h3>
     </div>
@@ -211,22 +211,18 @@ const loadMainPage = (data) => {
         <div class="main-content-hero">
           <div class="image-container">
       <img id="weather-icon" class="weather-icon" src="./assets/sunny.svg" alt="Weather Icon">
-    </div>
+      </div>
           <div class="weather-info"> 
-          <h1>${Math.round(data.list[0].main.temp)}°C</h1>
+          <h1 class="big-temp">${Math.round(data.list[0].main.temp)}<sup class="big-temp-degrees">°C</sup></h1>
           <h2>${data.city.name}</h2>
           <h3>${data.list[0].weather[0].main}</h3>
           
           </div>
-          <div class="sunrise-sunset">
-            <div class="sunrise-container">
+          <div class="main-sunrise-sunset">
               <p><b>Sunrise</b></p>
-              <p>${sunriseTime}</p>
-            </div>
-            <div class="sunset-container">
+              <p>${sunriseTime}</p>            
               <p><b>Sunset</b></p>
               <p>${sunsetTime}</p>
-            </div>
         </div>
       </div>
       <button class="main-page-btn icon-button" type=button>
