@@ -61,29 +61,17 @@
 //   icon: string;
 // };
 
-const APIKey: string = "31ef2747a161bbc841cc049ca29ffc97";
+/*// One Day - Weather Data reference
+// { "coord": { "lon": 18.0649, "lat": 59.3326 }, "weather": [{ "id": 802, "main": "Clouds", "description": "scattered clouds", "icon": "03d" }], "base": "stations", "main": { "temp": 9.21, "feels_like": 8.08, "temp_min": 8.95, "temp_max": 9.58, "pressure": 1020, "humidity": 56, "sea_level": 1020, "grnd_level": 1015 }, "visibility": 10000, "wind": { "speed": 2.24, "deg": 293, "gust": 4.02 }, "clouds": { "all": 47 }, "dt": 1742293894, "sys": { "type": 2, "id": 2012100, "country": "SE", "sunrise": 1742273722, "sunset": 1742316975 }, "timezone": 3600, "id": 2673730, "name": "Stockholm", "cod": 200 }
+*/
 
 // SELECTORS
-const container = document.querySelector(".container")!;
+const APIKey: string = "31ef2747a161bbc841cc049ca29ffc97";
+const container = document.querySelector(".container")! as HTMLDivElement;
 let city: string = "stockholm";
-let weatherData;
-// const weatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
-const weatherURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=5&units=metric&appid=${APIKey}`;
-
-// FETCH WEATHER
-const fetchWeatherData = async (): Promise<void> => {
-  const response = await fetch(weatherURL);
-  const data = await response.json();
-  console.log(data);
-  weatherData = data;
-  console.log(weatherData);
-
-  loadWeatherData(weatherData);
-};
-
-
-// Data reference
-// { "coord": { "lon": 18.0649, "lat": 59.3326 }, "weather": [{ "id": 802, "main": "Clouds", "description": "scattered clouds", "icon": "03d" }], "base": "stations", "main": { "temp": 9.21, "feels_like": 8.08, "temp_min": 8.95, "temp_max": 9.58, "pressure": 1020, "humidity": 56, "sea_level": 1020, "grnd_level": 1015 }, "visibility": 10000, "wind": { "speed": 2.24, "deg": 293, "gust": 4.02 }, "clouds": { "all": 47 }, "dt": 1742293894, "sys": { "type": 2, "id": 2012100, "country": "SE", "sunrise": 1742273722, "sunset": 1742316975 }, "timezone": 3600, "id": 2673730, "name": "Stockholm", "cod": 200 }
+let weatherData: any;
+const oneWeatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
+const weatherForecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=5&units=metric&appid=${APIKey}`;
 
 
 // Unix to Time of Day Function
@@ -98,42 +86,39 @@ const updatePageStyle = () => {
 
   const isDaytime: boolean = currentHour >= sunriseHour && currentHour < sunsetHour
 
+  document.body.classList.remove("daytime", "nighttime")
   document.body.classList.add(isDaytime ? "daytime" : "nighttime")
 
-  console.log(`Current Hour: ${currentHour}, Sunrise Hour: ${sunriseHour}, Sunset Hour: ${sunsetHour}`)
 }
 
-// Fetch API
-const biankaWeatherData = async () => {
+// Fetch One Day API - Bianka
+const oneDayWeatherFetch = async () => {
   try {
-    const response = await fetch(weatherURL);
+    const response = await fetch(oneWeatherURL);
     const data = await response.json();
     console.log(data);
 
     weatherData = data;
     loadWeatherData(weatherData);
-    updatePageStyle(weatherData);
+    updatePageStyle();
 
   } catch (error) {
     console.error("Something went wrong", error)
   }
 };
 
-// LOAD LANDING PAGE DATA
-const loadWeatherData = () => {
+// LOAD LANDING PAGE DATA - Juan/Bianka/Christina
+const loadWeatherData = (weatherData?: any) => {
   container.innerHTML += `
   <div class="landing-page-container">
     <div class="image-container">
       <img id="weather-icon" class="weather-icon" src="./assets/sunny.svg" alt="Weather Icon">
     </div>
-    <div class=weather-info>
-      <h1>${data.list[0].main.temp}</h1>
-      <h2>City</h2>
-      <h3>Weather</h3>
+    <div class=weather-info>  
+      <h1>${Math.round(weatherData.main.temp)}°C</h1>
+      <h2>${weatherData.name}</h2>
+      <h3>${weatherData.weather[0].description}</h3>
     </div>
-    <h1>${weatherData.main.temp}°C</h1>
-    <h2>${weatherData.name}</h2>
-    <h3>${weatherData.weather[0].description}</h3>
     <div class="sunrise-sunset">
       <div class="sunrise-container">
         <p><b>Sunrise</b></p>
@@ -144,18 +129,62 @@ const loadWeatherData = () => {
         <p>${getLocalHours(weatherData.sys?.sunset)}</p>
       </div>
     </div>
-    <button class="icon-button">
+    <button class="icon-button" type=button>
       <img src="assets/button.svg" alt="Button Icon">
     </button>
   </div>`
 };
 
-document.addEventListener("DOMContentLoaded", fetchWeatherData);
+// Toggle Pages 
+let isLandingPage = true; // Track which page is currently displayed
 
-// LOAD MAIN PAGE
+const toggleWeatherView = async () => {
+  if (isLandingPage) {
+    await fetchWeatherData(); // Load Main Page
+  } else {
+    await oneDayWeatherFetch(); // Load Landing Page
+  }
+  isLandingPage = !isLandingPage; // Toggle state
+};
+
+// Button Event Listener
+document.addEventListener("click", (event) => {
+  const button = (event.target as HTMLElement).closest(".icon-button");
+  if (button) {
+    toggleWeatherView();
+  }
+});
+
+
+// FETCH WEATHER - CHRISTINA
+const fetchWeatherData = async (): Promise<void> => {
+  const response = await fetch(weatherForecastURL);
+  const data = await response.json();
+  console.log(data);
+  weatherData = data;
+  console.log(weatherData);
+
+  // loadWeatherData(weatherData);
+  loadMainPage(weatherData);
+};
+
+// LOAD MAIN PAGE - CHRISTINA
 const loadMainPage = (data: any) => {
-  const date = new Date(data.dt * 1000);
-  const day = date.getDay();
+  const sunriseTime = new Date(data.city.sunrise * 1000).toLocaleTimeString(
+    "en-GB",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
+  const sunsetTime = new Date(data.city.sunset * 1000).toLocaleTimeString(
+    "en-GB",
+    {
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
+
   const days = [
     "Sunday",
     "Monday",
@@ -166,37 +195,53 @@ const loadMainPage = (data: any) => {
     "Saturday",
   ];
 
+  const tempTableRows = data.list
+    .map((dayData: any) => {
+      const dayDate = new Date(dayData.dt * 1000);
+      const dayName = days[dayDate.getDay()];
+      const minTemp = Math.round(dayData.main.temp_min);
+      const maxTemp = Math.round(dayData.main.temp_max);
+      const weatherIcon = dayData.weather[0].icon;
+
+      return `
+    <div class="main-temp-table-row">
+        <div class="main-temp-table-day">${dayName}</div>
+        <div class="main-temp-table-img"><img src="https://openweathermap.org/img/wn/${weatherIcon}.png" alt="${dayData.weather[0].description}"></div>
+        <div class="main-temp-table-temp">${minTemp} / ${maxTemp}°C</div>
+      </div>
+    `;
+    })
+    .join("");
+
   container.innerHTML = `
   <div class="main-content-container">
         <div class="main-content-hero">
           <img>
-          <h1>${data.main.temp}</h1>
-          <h2>${data.name}</h2>
-          <h3>${data.weather[0].main}</h3>
+          <h1>${data.list[0].main.temp}°C</h1>
+          <h2>${data.city.name}</h2>
+          <h3>${data.list[0].weather[0].main}</h3>
           <div class="main-sunrise-sunset">
             <div class="main-sunrise-container">
               <p>Sunrise</p>
-              <p>${data.sys.sunrise}</p>
+              <p>${sunriseTime}</p>
             </div>
             <div class="main-sunset-container">
               <p>Sunset</p>
-              <p>${data.sys.sunset}</p>
+              <p>${sunsetTime}</p>
             </div>
         </div>
       </div>
       <button class="main-content-btn">></button>
         <div class="main-temp-table">
           <div class="main-temp-table-row">
-            <div class="main-temp-table-day">${days[day]}</div>
-            <div class="main-temp-table-img"><img></div>
-            <div class="main-temp-table-temp">26/12</div>
+            ${tempTableRows}
           </div>
         </div>
     </div>
   `;
 };
 
-// HAMBURGER MENU TOGGLE
+// HAMBURGER MENU TOGGLE - Talo
 
 // Select the hamburger menu and navbar elements
 const menuIcon = document.getElementById("menu-icon")!;
@@ -209,4 +254,5 @@ menuIcon.addEventListener("click", () => {
 });
 
 
-biankaWeatherData()
+
+oneDayWeatherFetch()
