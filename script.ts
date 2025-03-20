@@ -204,15 +204,7 @@ const loadMainPage = (data: any) => {
     }
   );
 
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const tempTableRows = data.list
     .map((dayData: any) => {

@@ -180,15 +180,7 @@ const loadMainPage = (data) => {
         hour: "2-digit",
         minute: "2-digit",
     });
-    const days = [
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-    ];
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     const tempTableRows = data.list
         .map((dayData) => {
         const dayDate = new Date(dayData.dt * 1000);
