@@ -195,12 +195,22 @@ const loadMainPage = (data) => {
         const dayName = days[dayDate.getDay()];
         const minTemp = Math.round(dayData.main.temp_min);
         const maxTemp = Math.round(dayData.main.temp_max);
-        const weatherIcon = dayData.weather[0].icon;
+        // const weatherIcon = dayData.weather[0].icon;
+        let weatherIcon = "";
+        if (dayData.weather[0].description === "clear sky") {
+            weatherIcon = "./assets/sunny.svg";
+        }
+        else if (dayData.weather[0].description === "few clouds") {
+            weatherIcon = "./assets/partly-cloudy.svg";
+        }
+        else if (dayData.weather[0].description === "scattered clouds") {
+            weatherIcon = "./assets/overcast.svg";
+        }
         console.log("Day name:", dayName);
         return `
     <div class="main-temp-table-row">
         <div class="main-temp-table-day">${dayName}</div>
-        <div class="main-temp-table-img"><img src="https://openweathermap.org/img/wn/${weatherIcon}.png" alt="${dayData.weather[0].description}"></div>
+        <div><img class="main-temp-table-img" src="${weatherIcon}" alt="${dayData.weather[0].description}"></div>
         <div class="main-temp-table-temp">${minTemp} / ${maxTemp}°C</div>
       </div>
     `;
