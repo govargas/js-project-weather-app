@@ -101,12 +101,10 @@ body {
   width: 100vw; /* Full viewport width */
   height: 100vh;
   max-width: 100%; /* Prevent overflow */
-  background: rgba(255, 255, 255, 0.6); /* Semi-transparent white */
-  backdrop-filter: blur(10px); /* Frosted glass effect */
+  background: #fff;
   padding: 20px;
   display: flex;
   flex-direction: column;
-  border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   color: darkslategray;
   gap: 1rem;

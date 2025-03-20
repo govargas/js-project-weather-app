@@ -81,18 +81,6 @@ const getLocalHours = (unixTime: number) => {
     hour12: false,
   });
 };
-// Style Page by Time of Day (ToD)
-const updatePageStyle = () => {
-  const currentHour: string = getLocalHours(weatherData.dt);
-  const sunriseHour: string = getLocalHours(weatherData.sys.sunrise);
-  const sunsetHour: string = getLocalHours(weatherData.sys.sunset);
-
-  const isDaytime: boolean =
-    currentHour >= sunriseHour && currentHour < sunsetHour;
-
-  document.body.classList.remove("daytime", "nighttime");
-  document.body.classList.add(isDaytime ? "daytime" : "nighttime");
-};
 
 // Fetch One Day API - Bianka
 const oneDayWeatherFetch = async () => {
@@ -103,7 +91,7 @@ const oneDayWeatherFetch = async () => {
 
     weatherData = data;
     loadWeatherData(weatherData);
-    fetchWeatherData(); //REMOVE THIS WHEN FINISHED
+    // fetchWeatherData(); //REMOVE THIS WHEN FINISHED
     updatePageStyle();
   } catch (error) {
     console.error("Something went wrong", error);
@@ -138,6 +126,19 @@ const loadWeatherData = (weatherData?: any) => {
       <img src="assets/button.svg" alt="Button Icon">
     </button>
   </div>`;
+};
+
+// Style Page by Time of Day (ToD)
+const updatePageStyle = () => {
+  const currentHour: string = getLocalHours(weatherData.dt);
+  const sunriseHour: string = getLocalHours(weatherData.sys.sunrise);
+  const sunsetHour: string = getLocalHours(weatherData.sys.sunset);
+
+  const isDaytime: boolean =
+    currentHour >= sunriseHour && currentHour < sunsetHour;
+
+  document.body.classList.remove("daytime", "nighttime");
+  document.body.classList.add(isDaytime ? "daytime" : "nighttime");
 };
 
 // Toggle Pages
