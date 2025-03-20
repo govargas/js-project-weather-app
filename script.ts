@@ -71,25 +71,16 @@ const container = document.querySelector(".container")! as HTMLDivElement;
 let city: string = "stockholm";
 let weatherData: any;
 const oneWeatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
-const weatherForecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&cnt=5&units=metric&appid=${APIKey}`;
-
+const weatherForecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${APIKey}`;
 
 // Unix to Time of Day Function
 const getLocalHours = (unixTime: number) => {
-  return new Date(unixTime * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
-}
-// Style Page by Time of Day (ToD)
-const updatePageStyle = () => {
-  const currentHour: string = getLocalHours(weatherData.dt)
-  const sunriseHour: string = getLocalHours(weatherData.sys.sunrise)
-  const sunsetHour: string = getLocalHours(weatherData.sys.sunset)
-
-  const isDaytime: boolean = currentHour >= sunriseHour && currentHour < sunsetHour
-
-  document.body.classList.remove("daytime", "nighttime")
-  document.body.classList.add(isDaytime ? "daytime" : "nighttime")
-
-}
+  return new Date(unixTime * 1000).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
 
 // Fetch One Day API - Bianka
 const oneDayWeatherFetch = async () => {
@@ -100,10 +91,10 @@ const oneDayWeatherFetch = async () => {
 
     weatherData = data;
     loadWeatherData(weatherData);
+    // fetchWeatherData(); //REMOVE THIS WHEN FINISHED
     updatePageStyle();
-
   } catch (error) {
-    console.error("Something went wrong", error)
+    console.error("Something went wrong", error);
   }
 };
 
@@ -112,10 +103,12 @@ const loadWeatherData = (weatherData?: any) => {
   container.innerHTML += `
   <div class="landing-page-container">
     <div class="image-container">
-      <img id="weather-icon" class="weather-icon" src="./assets/sunny.svg" alt="Weather Icon">
+      <img id="weather-icon" class="weather-icon" src="./assets/sunny-w.svg" alt="Weather Icon">
     </div>
-    <div class=weather-info>  
-      <h1>${Math.round(weatherData.main.temp)}°C</h1>
+    <div class="weather-info">  
+      <h1 class="big-temp">${Math.round(
+        weatherData.main.temp
+      )}<sup class="big-temp-degrees">°C</sup></h1>
       <h2>${weatherData.name}</h2>
       <h3>${weatherData.weather[0].description}</h3>
     </div>
@@ -132,10 +125,23 @@ const loadWeatherData = (weatherData?: any) => {
     <button class="icon-button" type=button>
       <img src="assets/button.svg" alt="Button Icon">
     </button>
-  </div>`
+  </div>`;
 };
 
-// Toggle Pages 
+// Style Page by Time of Day (ToD)
+const updatePageStyle = () => {
+  const currentHour: string = getLocalHours(weatherData.dt);
+  const sunriseHour: string = getLocalHours(weatherData.sys.sunrise);
+  const sunsetHour: string = getLocalHours(weatherData.sys.sunset);
+
+  const isDaytime: boolean =
+    currentHour >= sunriseHour && currentHour < sunsetHour;
+
+  document.body.classList.remove("daytime", "nighttime");
+  document.body.classList.add(isDaytime ? "daytime" : "nighttime");
+};
+
+// Toggle Pages
 let isLandingPage = true; // Track which page is currently displayed
 
 const toggleWeatherView = async () => {
@@ -155,17 +161,30 @@ document.addEventListener("click", (event) => {
   }
 });
 
-
 // FETCH WEATHER - CHRISTINA
+
 const fetchWeatherData = async (): Promise<void> => {
   const response = await fetch(weatherForecastURL);
   const data = await response.json();
-  console.log(data);
+
+  const uniqueDays = new Map();
+
+  data.list.forEach((entry: any) => {
+    const date = entry.dt_txt.split(" ")[0];
+    if (!uniqueDays.has(date) || entry.dt_txt.includes("12:00:00")) {
+      uniqueDays.set(date, entry);
+    }
+  });
+
+  const filteredForecast = Array.from(uniqueDays.values()).slice(0, 5);
+
+  const filteredWeatherData = { ...data, list: filteredForecast };
+
   weatherData = data;
   console.log(weatherData);
 
   // loadWeatherData(weatherData);
-  loadMainPage(weatherData);
+  loadMainPage(filteredWeatherData);
 };
 
 // LOAD MAIN PAGE - CHRISTINA
@@ -185,15 +204,7 @@ const loadMainPage = (data: any) => {
     }
   );
 
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const tempTableRows = data.list
     .map((dayData: any) => {
@@ -201,12 +212,22 @@ const loadMainPage = (data: any) => {
       const dayName = days[dayDate.getDay()];
       const minTemp = Math.round(dayData.main.temp_min);
       const maxTemp = Math.round(dayData.main.temp_max);
-      const weatherIcon = dayData.weather[0].icon;
+      // const weatherIcon = dayData.weather[0].icon;
+      let weatherIcon: string = "";
+      if (dayData.weather[0].description === "clear sky") {
+        weatherIcon = "./assets/sunny-g.svg";
+      } else if (dayData.weather[0].description === "few clouds") {
+        weatherIcon = "./assets/partly-cloudy.svg";
+      } else if (dayData.weather[0].description === "scattered clouds") {
+        weatherIcon = "./assets/overcast.svg";
+      }
+
+      console.log("Day name:", dayName);
 
       return `
     <div class="main-temp-table-row">
         <div class="main-temp-table-day">${dayName}</div>
-        <div class="main-temp-table-img"><img src="https://openweathermap.org/img/wn/${weatherIcon}.png" alt="${dayData.weather[0].description}"></div>
+        <div><img class="main-temp-table-img" src="${weatherIcon}" alt="${dayData.weather[0].description}"></div>
         <div class="main-temp-table-temp">${minTemp} / ${maxTemp}°C</div>
       </div>
     `;
@@ -216,26 +237,31 @@ const loadMainPage = (data: any) => {
   container.innerHTML = `
   <div class="main-content-container">
         <div class="main-content-hero">
-          <img>
-          <h1>${data.list[0].main.temp}°C</h1>
+          <div class="image-container">
+      <img id="weather-icon" class="weather-icon" src="./assets/sunny-w.svg" alt="Weather Icon">
+      </div>
+          <div class="weather-info"> 
+          <h1 class="big-temp">${Math.round(
+            data.list[0].main.temp
+          )}<sup class="big-temp-degrees">°C</sup></h1>
           <h2>${data.city.name}</h2>
           <h3>${data.list[0].weather[0].main}</h3>
+          
+          </div>
           <div class="main-sunrise-sunset">
-            <div class="main-sunrise-container">
-              <p>Sunrise</p>
-              <p>${sunriseTime}</p>
-            </div>
-            <div class="main-sunset-container">
-              <p>Sunset</p>
+              <p><b>Sunrise</b></p>
+              <p>${sunriseTime}</p>            
+              <p><b>Sunset</b></p>
               <p>${sunsetTime}</p>
-            </div>
         </div>
       </div>
-      <button class="main-content-btn">></button>
+      <button class="main-page-btn icon-button" type=button>
+      <img src="assets/button.svg" alt="Button Icon">
+    </button>
         <div class="main-temp-table">
-          <div class="main-temp-table-row">
+          
             ${tempTableRows}
-          </div>
+          
         </div>
     </div>
   `;
@@ -253,6 +279,5 @@ menuIcon.addEventListener("click", () => {
   navbar.classList.toggle("open");
 });
 
-
-
-oneDayWeatherFetch()
+oneDayWeatherFetch();
+// fetchWeatherData();
