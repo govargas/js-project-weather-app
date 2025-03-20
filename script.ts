@@ -103,7 +103,7 @@ const loadWeatherData = (weatherData?: any) => {
   container.innerHTML += `
   <div class="landing-page-container">
     <div class="image-container">
-      <img id="weather-icon" class="weather-icon" src="./assets/sunny.svg" alt="Weather Icon">
+      <img id="weather-icon" class="weather-icon" src="./assets/sunny-w.svg" alt="Weather Icon">
     </div>
     <div class="weather-info">  
       <h1 class="big-temp">${Math.round(
@@ -223,7 +223,7 @@ const loadMainPage = (data: any) => {
       // const weatherIcon = dayData.weather[0].icon;
       let weatherIcon: string = "";
       if (dayData.weather[0].description === "clear sky") {
-        weatherIcon = "./assets/sunny.svg";
+        weatherIcon = "./assets/sunny-g.svg";
       } else if (dayData.weather[0].description === "few clouds") {
         weatherIcon = "./assets/partly-cloudy.svg";
       } else if (dayData.weather[0].description === "scattered clouds") {
@@ -246,7 +246,7 @@ const loadMainPage = (data: any) => {
   <div class="main-content-container">
         <div class="main-content-hero">
           <div class="image-container">
-      <img id="weather-icon" class="weather-icon" src="./assets/sunny.svg" alt="Weather Icon">
+      <img id="weather-icon" class="weather-icon" src="./assets/sunny-w.svg" alt="Weather Icon">
       </div>
           <div class="weather-info"> 
           <h1 class="big-temp">${Math.round(
