@@ -239,7 +239,6 @@ const fetchWeatherData = async (): Promise<void> => {
 // LOAD MAIN PAGE - CHRISTINA
 const weatherIcons: Record<string, string> = {
   "clear sky": "./assets/sunny-g.svg",
-  "light snow": "./assets/overcast.svg",
   "few clouds": "./assets/partly-cloudy.svg",
   "scattered clouds": "./assets/overcast.svg",
   "broken clouds": "./assets/partly-cloudy.svg",
@@ -278,10 +277,11 @@ const loadMainPage = (data: any) => {
       // const weatherIcon = dayData.weather[0].icon;
       let weatherIcon: string = "";
       const weatherDescription = dayData.weather[0].description.toLowerCase();
-      weatherIcon = weatherIcons[weatherDescription];
+      weatherIcon = weatherIcons[weatherDescription] || "./assets/overcast.svg";
+      // Dynamically adds icons depend on weather or defaults to overcast
       console.log("weather icon:", weatherIcon)
 
-      // if (dayData.weather[0].description === "clear sky") {
+      // if (dayData.weather[0].description === "clear sky") 
       //   weatherIcon = "./assets/sunny-g.svg";
       // } else if (dayData.weather[0].description === "few clouds") {
       //   weatherIcon = "./assets/partly-cloudy.svg";

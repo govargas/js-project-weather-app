@@ -21,7 +21,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   height: 85vh;
-  padding: 1rem;
+  padding: 1.5rem;
 }
 
 .main-content-container {
@@ -178,6 +178,7 @@ body {
 .navbar li {
   padding: 8px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
 }
 
 /* Remove border from last item */
