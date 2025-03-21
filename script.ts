@@ -107,8 +107,8 @@ const loadWeatherData = (weatherData?: any) => {
     </div>
     <div class="weather-info">  
       <h1 class="big-temp">${Math.round(
-        weatherData.main.temp
-      )}<sup class="big-temp-degrees">°C</sup></h1>
+    weatherData.main.temp
+  )}<sup class="big-temp-degrees">°C</sup></h1>
       <h2>${weatherData.name}</h2>
       <h3>${weatherData.weather[0].description}</h3>
     </div>
@@ -145,6 +145,7 @@ const updatePageStyle = () => {
 let isLandingPage = true; // Track which page is currently displayed
 
 const toggleWeatherView = async () => {
+  container.innerHTML = "";
   if (isLandingPage) {
     await fetchWeatherData(); // Load Main Page
   } else {
@@ -157,6 +158,7 @@ const toggleWeatherView = async () => {
 document.addEventListener("click", (event) => {
   const button = (event.target as HTMLElement).closest(".icon-button");
   if (button) {
+
     toggleWeatherView();
   }
 });
@@ -188,6 +190,19 @@ const fetchWeatherData = async (): Promise<void> => {
 };
 
 // LOAD MAIN PAGE - CHRISTINA
+const weatherIcons: Record<string, string> = {
+  "clear sky": "./assets/sunny-g.svg",
+  "few clouds": "./assets/partly-cloudy.svg",
+  "scattered clouds": "./assets/overcast.svg",
+  "broken clouds": "./assets/partly-cloudy.svg",
+  "shower rain": "./assets/overcast.svg",
+  "overcast clouds": "./assets/overcast.svg",
+  "rain": "./assets/overcast.svg",
+  "thunderstorm": "./assets/overcast.svg",
+  "snow": "./assets/overcast.svg",
+  "mist": "./assets/overcast.svg"
+}
+
 const loadMainPage = (data: any) => {
   const sunriseTime = new Date(data.city.sunrise * 1000).toLocaleTimeString(
     "en-GB",
@@ -214,13 +229,17 @@ const loadMainPage = (data: any) => {
       const maxTemp = Math.round(dayData.main.temp_max);
       // const weatherIcon = dayData.weather[0].icon;
       let weatherIcon: string = "";
-      if (dayData.weather[0].description === "clear sky") {
-        weatherIcon = "./assets/sunny-g.svg";
-      } else if (dayData.weather[0].description === "few clouds") {
-        weatherIcon = "./assets/partly-cloudy.svg";
-      } else if (dayData.weather[0].description === "scattered clouds") {
-        weatherIcon = "./assets/overcast.svg";
-      }
+      const weatherDescription = dayData.weather[0].description.toLowerCase();
+      weatherIcon = weatherIcons[weatherDescription];
+      console.log("weather icon:", weatherIcon)
+
+      // if (dayData.weather[0].description === "clear sky") {
+      //   weatherIcon = "./assets/sunny-g.svg";
+      // } else if (dayData.weather[0].description === "few clouds") {
+      //   weatherIcon = "./assets/partly-cloudy.svg";
+      // } else if (dayData.weather[0].description === "scattered clouds") {
+      //   weatherIcon = "./assets/overcast.svg";
+      // }
 
       console.log("Day name:", dayName);
 
@@ -242,8 +261,8 @@ const loadMainPage = (data: any) => {
       </div>
           <div class="weather-info"> 
           <h1 class="big-temp">${Math.round(
-            data.list[0].main.temp
-          )}<sup class="big-temp-degrees">°C</sup></h1>
+    data.list[0].main.temp
+  )}<sup class="big-temp-degrees">°C</sup></h1>
           <h2>${data.city.name}</h2>
           <h3>${data.list[0].weather[0].main}</h3>
           

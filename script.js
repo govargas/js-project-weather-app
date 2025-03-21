@@ -137,6 +137,7 @@ const updatePageStyle = () => {
 // Toggle Pages
 let isLandingPage = true; // Track which page is currently displayed
 const toggleWeatherView = () => __awaiter(void 0, void 0, void 0, function* () {
+    container.innerHTML = "";
     if (isLandingPage) {
         yield fetchWeatherData(); // Load Main Page
     }
@@ -171,6 +172,18 @@ const fetchWeatherData = () => __awaiter(void 0, void 0, void 0, function* () {
     loadMainPage(filteredWeatherData);
 });
 // LOAD MAIN PAGE - CHRISTINA
+const weatherIcons = {
+    "clear sky": "./assets/sunny-g.svg",
+    "few clouds": "./assets/partly-cloudy.svg",
+    "scattered clouds": "./assets/overcast.svg",
+    "broken clouds": "./assets/partly-cloudy.svg",
+    "shower rain": "./assets/overcast.svg",
+    "overcast clouds": "./assets/overcast.svg",
+    "rain": "./assets/overcast.svg",
+    "thunderstorm": "./assets/overcast.svg",
+    "snow": "./assets/overcast.svg",
+    "mist": "./assets/overcast.svg"
+};
 const loadMainPage = (data) => {
     const sunriseTime = new Date(data.city.sunrise * 1000).toLocaleTimeString("en-GB", {
         hour: "2-digit",
@@ -189,15 +202,16 @@ const loadMainPage = (data) => {
         const maxTemp = Math.round(dayData.main.temp_max);
         // const weatherIcon = dayData.weather[0].icon;
         let weatherIcon = "";
-        if (dayData.weather[0].description === "clear sky") {
-            weatherIcon = "./assets/sunny-g.svg";
-        }
-        else if (dayData.weather[0].description === "few clouds") {
-            weatherIcon = "./assets/partly-cloudy.svg";
-        }
-        else if (dayData.weather[0].description === "scattered clouds") {
-            weatherIcon = "./assets/overcast.svg";
-        }
+        const weatherDescription = dayData.weather[0].description.toLowerCase();
+        weatherIcon = weatherIcons[weatherDescription];
+        console.log("weather icon:", weatherIcon);
+        // if (dayData.weather[0].description === "clear sky") {
+        //   weatherIcon = "./assets/sunny-g.svg";
+        // } else if (dayData.weather[0].description === "few clouds") {
+        //   weatherIcon = "./assets/partly-cloudy.svg";
+        // } else if (dayData.weather[0].description === "scattered clouds") {
+        //   weatherIcon = "./assets/overcast.svg";
+        // }
         console.log("Day name:", dayName);
         return `
     <div class="main-temp-table-row">
