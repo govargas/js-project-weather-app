@@ -70,12 +70,24 @@ const APIKey: string = "31ef2747a161bbc841cc049ca29ffc97";
 const container = document.querySelector(".container")! as HTMLDivElement;
 let city: string = "stockholm";
 let weatherData: any;
-const oneWeatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
-const weatherForecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${APIKey}`;
+let oneWeatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
+let weatherForecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${APIKey}`;
 
 // Unix to Time of Day Function
 const getLocalHours = (unixTime: number) => {
   return new Date(unixTime * 1000).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
+
+const getCityTime = (unixTime: number, timezoneOffset: number): string => {
+  // Convert the Unix timestamp to UTC
+  const utcTime = new Date(unixTime * 1000);
+  // Adjust UTC time by the timezone offset (in seconds) to get the city's time
+  const cityTime = new Date(utcTime.getTime() + timezoneOffset * 1000);
+  return cityTime.toLocaleTimeString("en-GB", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -103,7 +115,7 @@ const loadWeatherData = (weatherData?: any) => {
   container.innerHTML += `
   <div class="landing-page-container">
     <div class="image-container">
-      <img id="weather-icon" class="weather-icon" src="./assets/sunny-w.svg" alt="Weather Icon">
+      <img id="weather-icon" class="weather-icon" src="" alt="Weather Icon">
     </div>
     <div class="weather-info">  
       <h1 class="big-temp">${Math.round(
@@ -115,22 +127,27 @@ const loadWeatherData = (weatherData?: any) => {
     <div class="sunrise-sunset">
       <div class="sunrise-container">
         <p><b>Sunrise</b></p>
-        <p>${getLocalHours(weatherData.sys?.sunrise)}</p>
+        <p>${getCityTime(weatherData.sys.sunrise, weatherData.timezone)}</p>
       </div>
       <div class="sunset-container">
         <p>Sunset</p>
-        <p>${getLocalHours(weatherData.sys?.sunset)}</p>
+        <p>${getCityTime(weatherData.sys.sunset, weatherData.timezone)}</p>
       </div>
     </div>
     <button class="icon-button" type=button>
       <img src="assets/button.svg" alt="Button Icon">
     </button>
   </div>`;
+
+
 };
+
 
 // Style Page by Time of Day (ToD)
 const updatePageStyle = () => {
   const currentHour: string = getLocalHours(weatherData.dt);
+  console.log("🚀 ~ updatePageStyle ~ currentHour:", currentHour)
+
   const sunriseHour: string = getLocalHours(weatherData.sys.sunrise);
   const sunsetHour: string = getLocalHours(weatherData.sys.sunset);
 
@@ -139,7 +156,37 @@ const updatePageStyle = () => {
 
   document.body.classList.remove("daytime", "nighttime");
   document.body.classList.add(isDaytime ? "daytime" : "nighttime");
+
+  // Select or create the sun/moon container
+  let timeImages = document.querySelectorAll(".weather-icon") as NodeListOf<HTMLImageElement>;
+
+  timeImages.forEach((timeImage) => {
+    timeImage.src = isDaytime ? "./assets/sunny-w.svg" : "./assets/night.svg";
+    timeImage.alt = isDaytime ? "Sun Icon" : "Moon Icon";
+  })
 };
+
+const updateMainPageStyle = () => {
+  const currentHour: string = getLocalHours(weatherData.list[0].dt);
+  const sunriseHour: string = getLocalHours(weatherData.city.sunrise);
+  const sunsetHour: string = getLocalHours(weatherData.city.sunset);
+
+
+  const isDaytime: boolean =
+    currentHour >= sunriseHour && currentHour < sunsetHour;
+
+  document.body.classList.remove("daytime", "nighttime");
+  document.body.classList.add(isDaytime ? "daytime" : "nighttime");
+
+  // Select or create the sun/moon container
+  let timeImage = document.querySelector(".weather-icon") as HTMLImageElement;
+
+  timeImage.src = isDaytime ? "./assets/sunny-w.svg" : "./assets/night.svg";
+  timeImage.alt = isDaytime ? "Sun Icon" : "Moon Icon";
+
+};
+
+
 
 // Toggle Pages
 let isLandingPage = true; // Track which page is currently displayed
@@ -183,15 +230,16 @@ const fetchWeatherData = async (): Promise<void> => {
   const filteredWeatherData = { ...data, list: filteredForecast };
 
   weatherData = data;
-  console.log(weatherData);
+  console.log("weather data:", weatherData);
 
-  // loadWeatherData(weatherData);
   loadMainPage(filteredWeatherData);
+  updateMainPageStyle();
 };
 
 // LOAD MAIN PAGE - CHRISTINA
 const weatherIcons: Record<string, string> = {
   "clear sky": "./assets/sunny-g.svg",
+  "light snow": "./assets/overcast.svg",
   "few clouds": "./assets/partly-cloudy.svg",
   "scattered clouds": "./assets/overcast.svg",
   "broken clouds": "./assets/partly-cloudy.svg",
@@ -257,7 +305,7 @@ const loadMainPage = (data: any) => {
   <div class="main-content-container">
         <div class="main-content-hero">
           <div class="image-container">
-      <img id="weather-icon" class="weather-icon" src="./assets/sunny-w.svg" alt="Weather Icon">
+      <img id="weather-icon" class="weather-icon" src="" alt="Weather Icon">
       </div>
           <div class="weather-info"> 
           <h1 class="big-temp">${Math.round(
@@ -300,3 +348,25 @@ menuIcon.addEventListener("click", () => {
 
 oneDayWeatherFetch();
 // fetchWeatherData();
+
+// Navbar click event listener for updating weather based on selected city
+const navbarList = document.querySelector(".navbar ul");
+if (navbarList) {
+  navbarList.addEventListener("click", async (event) => {
+    const target = event.target as HTMLElement;
+    if (target.tagName.toLowerCase() === "li") {
+      // Update the global city variable with the selected city's text
+      city = target.innerText.trim();
+      // Recalculate the API URLs for the new city
+      oneWeatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
+      weatherForecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${APIKey}`;
+
+      // Clear current content and close the navbar if open
+      container.innerHTML = "";
+      navbar.classList.remove("open");
+
+      // Fetch weather for the selected city (using the one-day fetch, adjust if needed)
+      await oneDayWeatherFetch();
+    }
+  });
+}
