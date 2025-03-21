@@ -1,5 +1,4 @@
 /* Universal reset */
-
 * {
   margin: 0;
   padding: 0;
@@ -7,7 +6,6 @@
 }
 
 /* Landing page styling */
-
 body {
   font-family: "Roboto", sans-serif;
   color: #fff;
@@ -23,7 +21,7 @@ body {
   flex-direction: column;
   justify-content: space-between;
   height: 85vh;
-  padding: 1rem;
+  padding: 1.5rem;
 }
 
 .main-content-container {
@@ -99,7 +97,7 @@ body {
 /* MAIN PAGE TEMP TABLE */
 .main-temp-table {
   width: 100vw; /* Full viewport width */
-  height: 100vh;
+  height: auto;
   max-width: 100%; /* Prevent overflow */
   background: #fff;
   padding: 20px;
@@ -108,11 +106,6 @@ body {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   color: darkslategray;
   gap: 1rem;
-
-  /* display: flex;
-  flex-direction: column;
-  background-color: white;
-  */
 }
 
 .main-temp-table-img {
@@ -133,7 +126,7 @@ body {
   cursor: pointer;
   user-select: none;
   position: absolute;
-  top: 20px;
+  top: 60px;
   left: 20px;
 }
 
@@ -162,10 +155,10 @@ body {
 /* Navbar styling */
 .navbar {
   position: absolute;
-  top: 60px; /* Adjust this if needed based on menu icon height */
+  top: 90px; /* Adjust this if needed based on menu icon height */
   left: 20px;
   width: 50vw; /* 50% of the viewport width */
-  background-color: rgba(0, 0, 0, 0.5); /* Black with 50% transparency */
+  background-color: rgba(0, 0, 0, 0.3); /* Black with 30% transparency */
   color: #fff;
   padding: 10px;
   display: none; /* Hidden by default */
@@ -185,6 +178,7 @@ body {
 .navbar li {
   padding: 8px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
 }
 
 /* Remove border from last item */
@@ -198,4 +192,47 @@ body.daytime {
 
 body.nighttime {
   background: linear-gradient(270deg, #6264a2, #222350);
+}
+
+/* Tablet view */
+@media (min-width: 668px) {
+  .container {
+    width: 90%;
+    margin: 0 auto;
+    padding: 1rem;
+  }
+  
+  .big-temp {
+    font-size: 8rem;
+  }
+  
+  /* Adjust navbar and hamburger icon positions */
+  .navbar {
+    left: calc((100% - 90%) / 2 + 20px);
+  }
+  .menu-icon {
+    left: calc((100% - 90%) / 2 + 20px);
+  }
+}
+
+/* Desktop view */
+@media (min-width: 1024px) {
+  .container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .big-temp {
+    font-size: 9rem;
+  }
+  
+  /* Adjust navbar and hamburger icon positions */
+  .navbar {
+    left: calc((100% - 80%) / 2 + 20px);
+  }
+  .menu-icon {
+    left: calc((100% - 80%) / 2 + 20px);
+  }
+
 }
