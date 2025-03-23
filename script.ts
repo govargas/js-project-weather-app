@@ -73,7 +73,7 @@ let weatherData: any;
 let oneWeatherURL: string = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
 let weatherForecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${APIKey}`;
 
-// Unix to Time of Day Function
+// Unix to Time of Day Function (local formatting, if needed)
 const getLocalHours = (unixTime: number) => {
   return new Date(unixTime * 1000).toLocaleTimeString([], {
     hour: "2-digit",
@@ -83,11 +83,16 @@ const getLocalHours = (unixTime: number) => {
 };
 
 const getCityTime = (unixTime: number, timezoneOffset: number): string => {
-  // Convert the Unix timestamp to UTC
-  const utcTime = new Date(unixTime * 1000);
-  // Adjust UTC time by the timezone offset (in seconds) to get the city's time
-  const cityTime = new Date(utcTime.getTime() + timezoneOffset * 1000);
-  return cityTime.toLocaleTimeString("en-GB", {
+  // Convert the Unix timestamp (in seconds) to milliseconds (UTC)
+  const utcTimestamp = unixTime * 1000;
+  // Apply the city's offset (in seconds) to get the adjusted timestamp
+  const adjustedTimestamp = utcTimestamp + timezoneOffset * 1000;
+  // Create a date with the adjusted timestamp
+  const date = new Date(adjustedTimestamp);
+  // Format the date as if it were in UTC—since we've already added the offset,
+  // this will display the correct city-local time regardless of the user's timezone.
+  return date.toLocaleTimeString("en-GB", {
+    timeZone: "UTC",
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -100,7 +105,6 @@ const oneDayWeatherFetch = async () => {
     const response = await fetch(oneWeatherURL);
     const data = await response.json();
     console.log(data);
-
     weatherData = data;
     loadWeatherData(weatherData);
     // fetchWeatherData(); //REMOVE THIS WHEN FINISHED
@@ -118,9 +122,7 @@ const loadWeatherData = (weatherData?: any) => {
       <img id="weather-icon" class="weather-icon" src="" alt="Weather Icon">
     </div>
     <div class="weather-info">  
-      <h1 class="big-temp">${Math.round(
-    weatherData.main.temp
-  )}<sup class="big-temp-degrees">°C</sup></h1>
+      <h1 class="big-temp">${Math.round(weatherData.main.temp)}<sup class="big-temp-degrees">°C</sup></h1>
       <h2>${weatherData.name}</h2>
       <h3>${weatherData.weather[0].description}</h3>
     </div>
@@ -138,59 +140,67 @@ const loadWeatherData = (weatherData?: any) => {
       <img src="assets/button.svg" alt="Button Icon">
     </button>
   </div>`;
-
-
 };
 
-
-// Style Page by Time of Day (ToD)
+// Style Page by Time of Day (ToD) for Landing Page
 const updatePageStyle = () => {
-  const currentHour: string = getLocalHours(weatherData.dt);
-  console.log("🚀 ~ updatePageStyle ~ currentHour:", currentHour)
+  // Use actual current time (Date.now()) adjusted by the city's timezone
+  const nowUTC = Date.now();
+  const currentCityTime = new Date(nowUTC + weatherData.timezone * 1000);
+  const currentHourStr = currentCityTime.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  
+  const sunriseHourStr = getCityTime(weatherData.sys.sunrise, weatherData.timezone);
+  const sunsetHourStr = getCityTime(weatherData.sys.sunset, weatherData.timezone);
 
-  const sunriseHour: string = getLocalHours(weatherData.sys.sunrise);
-  const sunsetHour: string = getLocalHours(weatherData.sys.sunset);
+  const currentHour = parseInt(currentHourStr.split(":")[0]);
+  const sunriseHour = parseInt(sunriseHourStr.split(":")[0]);
+  const sunsetHour = parseInt(sunsetHourStr.split(":")[0]);
 
-  const isDaytime: boolean =
-    currentHour >= sunriseHour && currentHour < sunsetHour;
+  const isDaytime = currentHour >= sunriseHour && currentHour < sunsetHour;
 
   document.body.classList.remove("daytime", "nighttime");
   document.body.classList.add(isDaytime ? "daytime" : "nighttime");
 
-  // Select or create the sun/moon container
-  let timeImages = document.querySelectorAll(".weather-icon") as NodeListOf<HTMLImageElement>;
-
+  const timeImages = document.querySelectorAll(".weather-icon") as NodeListOf<HTMLImageElement>;
   timeImages.forEach((timeImage) => {
     timeImage.src = isDaytime ? "./assets/sunny-w.svg" : "./assets/night.svg";
     timeImage.alt = isDaytime ? "Sun Icon" : "Moon Icon";
-  })
+  });
 };
 
+// Style Page by Time of Day (ToD) for Main Page
 const updateMainPageStyle = () => {
-  const currentHour: string = getLocalHours(weatherData.list[0].dt);
-  const sunriseHour: string = getLocalHours(weatherData.city.sunrise);
-  const sunsetHour: string = getLocalHours(weatherData.city.sunset);
+  const nowUTC = Date.now();
+  const currentCityTime = new Date(nowUTC + weatherData.city.timezone * 1000);
+  const currentHourStr = currentCityTime.toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  
+  const sunriseHourStr = getCityTime(weatherData.city.sunrise, weatherData.city.timezone);
+  const sunsetHourStr = getCityTime(weatherData.city.sunset, weatherData.city.timezone);
 
+  const currentHour = parseInt(currentHourStr.split(":")[0]);
+  const sunriseHour = parseInt(sunriseHourStr.split(":")[0]);
+  const sunsetHour = parseInt(sunsetHourStr.split(":")[0]);
 
-  const isDaytime: boolean =
-    currentHour >= sunriseHour && currentHour < sunsetHour;
+  const isDaytime = currentHour >= sunriseHour && currentHour < sunsetHour;
 
   document.body.classList.remove("daytime", "nighttime");
   document.body.classList.add(isDaytime ? "daytime" : "nighttime");
 
-  // Select or create the sun/moon container
-  let timeImage = document.querySelector(".weather-icon") as HTMLImageElement;
-
+  const timeImage = document.querySelector(".weather-icon") as HTMLImageElement;
   timeImage.src = isDaytime ? "./assets/sunny-w.svg" : "./assets/night.svg";
   timeImage.alt = isDaytime ? "Sun Icon" : "Moon Icon";
-
 };
-
-
 
 // Toggle Pages
 let isLandingPage = true; // Track which page is currently displayed
-
 const toggleWeatherView = async () => {
   container.innerHTML = "";
   if (isLandingPage) {
@@ -205,33 +215,27 @@ const toggleWeatherView = async () => {
 document.addEventListener("click", (event) => {
   const button = (event.target as HTMLElement).closest(".icon-button");
   if (button) {
-
     toggleWeatherView();
   }
 });
 
 // FETCH WEATHER - CHRISTINA
-
 const fetchWeatherData = async (): Promise<void> => {
   const response = await fetch(weatherForecastURL);
   const data = await response.json();
 
   const uniqueDays = new Map();
-
   data.list.forEach((entry: any) => {
     const date = entry.dt_txt.split(" ")[0];
     if (!uniqueDays.has(date) || entry.dt_txt.includes("12:00:00")) {
       uniqueDays.set(date, entry);
     }
   });
-
   const filteredForecast = Array.from(uniqueDays.values()).slice(0, 5);
-
   const filteredWeatherData = { ...data, list: filteredForecast };
 
   weatherData = data;
   console.log("weather data:", weatherData);
-
   loadMainPage(filteredWeatherData);
   updateMainPageStyle();
 };
@@ -248,49 +252,23 @@ const weatherIcons: Record<string, string> = {
   "thunderstorm": "./assets/overcast.svg",
   "snow": "./assets/overcast.svg",
   "mist": "./assets/overcast.svg"
-}
+};
 
 const loadMainPage = (data: any) => {
-  const sunriseTime = new Date(data.city.sunrise * 1000).toLocaleTimeString(
-    "en-GB",
-    {
-      hour: "2-digit",
-      minute: "2-digit",
-    }
-  );
-  const sunsetTime = new Date(data.city.sunset * 1000).toLocaleTimeString(
-    "en-GB",
-    {
-      hour: "2-digit",
-      minute: "2-digit",
-    }
-  );
-
+  const sunriseTime = getCityTime(data.city.sunrise, data.city.timezone);
+  const sunsetTime = getCityTime(data.city.sunset, data.city.timezone);
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
   const tempTableRows = data.list
     .map((dayData: any) => {
       const dayDate = new Date(dayData.dt * 1000);
       const dayName = days[dayDate.getDay()];
       const minTemp = Math.round(dayData.main.temp_min);
       const maxTemp = Math.round(dayData.main.temp_max);
-      // const weatherIcon = dayData.weather[0].icon;
       let weatherIcon: string = "";
       const weatherDescription = dayData.weather[0].description.toLowerCase();
       weatherIcon = weatherIcons[weatherDescription] || "./assets/overcast.svg";
-      // Dynamically adds icons depend on weather or defaults to overcast
-      console.log("weather icon:", weatherIcon)
-
-      // if (dayData.weather[0].description === "clear sky") 
-      //   weatherIcon = "./assets/sunny-g.svg";
-      // } else if (dayData.weather[0].description === "few clouds") {
-      //   weatherIcon = "./assets/partly-cloudy.svg";
-      // } else if (dayData.weather[0].description === "scattered clouds") {
-      //   weatherIcon = "./assets/overcast.svg";
-      // }
-
+      console.log("weather icon:", weatherIcon);
       console.log("Day name:", dayName);
-
       return `
     <div class="main-temp-table-row">
         <div class="main-temp-table-day">${dayName}</div>
@@ -300,7 +278,6 @@ const loadMainPage = (data: any) => {
     `;
     })
     .join("");
-
   container.innerHTML = `
   <div class="main-content-container">
         <div class="main-content-hero">
@@ -308,12 +285,9 @@ const loadMainPage = (data: any) => {
       <img id="weather-icon" class="weather-icon" src="" alt="Weather Icon">
       </div>
           <div class="weather-info"> 
-          <h1 class="big-temp">${Math.round(
-    data.list[0].main.temp
-  )}<sup class="big-temp-degrees">°C</sup></h1>
+          <h1 class="big-temp">${Math.round(data.list[0].main.temp)}<sup class="big-temp-degrees">°C</sup></h1>
           <h2>${data.city.name}</h2>
           <h3>${data.list[0].weather[0].main}</h3>
-          
           </div>
           <div class="main-sunrise-sunset">
               <p><b>Sunrise</b></p>
@@ -326,46 +300,32 @@ const loadMainPage = (data: any) => {
       <img src="assets/button.svg" alt="Button Icon">
     </button>
         <div class="main-temp-table">
-          
             ${tempTableRows}
-          
         </div>
     </div>
   `;
 };
 
 // HAMBURGER MENU TOGGLE - Talo
-
-// Select the hamburger menu and navbar elements
 const menuIcon = document.getElementById("menu-icon")!;
 const navbar = document.querySelector(".navbar")!;
-
-// Toggle the navbar when the menu icon is clicked
 menuIcon.addEventListener("click", () => {
   menuIcon.classList.toggle("open");
   navbar.classList.toggle("open");
 });
-
 oneDayWeatherFetch();
 // fetchWeatherData();
-
 // Navbar click event listener for updating weather based on selected city
 const navbarList = document.querySelector(".navbar ul");
 if (navbarList) {
   navbarList.addEventListener("click", async (event) => {
     const target = event.target as HTMLElement;
     if (target.tagName.toLowerCase() === "li") {
-      // Update the global city variable with the selected city's text
       city = target.innerText.trim();
-      // Recalculate the API URLs for the new city
       oneWeatherURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${APIKey}`;
       weatherForecastURL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${APIKey}`;
-
-      // Clear current content and close the navbar if open
       container.innerHTML = "";
       navbar.classList.remove("open");
-
-      // Fetch weather for the selected city (using the one-day fetch, adjust if needed)
       await oneDayWeatherFetch();
     }
   });
