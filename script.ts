@@ -104,7 +104,6 @@ const oneDayWeatherFetch = async () => {
   try {
     const response = await fetch(oneWeatherURL);
     const data = await response.json();
-    console.log(data);
     weatherData = data;
     loadWeatherData(weatherData);
     // fetchWeatherData(); //REMOVE THIS WHEN FINISHED
@@ -259,9 +258,6 @@ const fetchWeatherData = async (): Promise<void> => {
     }
 
     const dayData = dailyData.get(date)!;
-    console.log(
-      `Date: ${date}, Temp: ${temp}, Min: ${dayData.minTemp}, Max: ${dayData.maxTemp}`
-    );
 
     dayData.entries.push(entry);
 
@@ -278,15 +274,7 @@ const fetchWeatherData = async (): Promise<void> => {
 
     dayData.minTemp = Math.min(...allTemps);
     dayData.maxTemp = Math.max(...allTemps);
-
-    console.log(
-      `Final for ${date} - Min: ${dayData.minTemp}, Max: ${
-        dayData.maxTemp
-      }, Temps: ${allTemps.join(", ")}`
-    );
   });
-
-  console.log("Daily Data:", Array.from(dailyData.entries()));
 
   const filteredForecast = Array.from(dailyData.values())
     .slice(0, 5)
@@ -302,8 +290,6 @@ const fetchWeatherData = async (): Promise<void> => {
   };
 
   weatherData = data;
-  console.log("weather data:", weatherData);
-  console.log("Filtered Forecast:", filteredForecast);
 
   loadMainPage(filteredWeatherData);
   updateMainPageStyle();
@@ -336,8 +322,7 @@ const loadMainPage = (data: any) => {
       let weatherIcon: string = "";
       const weatherDescription = dayData.weather[0].description.toLowerCase();
       weatherIcon = weatherIcons[weatherDescription] || "./assets/overcast.svg";
-      console.log("weather icon:", weatherIcon);
-      console.log("Day name:", dayName);
+
       return `
     <div class="main-temp-table-row">
         <div class="main-temp-table-day">${dayName}</div>

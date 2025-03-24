@@ -103,7 +103,6 @@ const oneDayWeatherFetch = () => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const response = yield fetch(oneWeatherURL);
         const data = yield response.json();
-        console.log(data);
         weatherData = data;
         loadWeatherData(weatherData);
         // fetchWeatherData(); //REMOVE THIS WHEN FINISHED
@@ -221,7 +220,6 @@ const fetchWeatherData = () => __awaiter(void 0, void 0, void 0, function* () {
             });
         }
         const dayData = dailyData.get(date);
-        console.log(`Date: ${date}, Temp: ${temp}, Min: ${dayData.minTemp}, Max: ${dayData.maxTemp}`);
         dayData.entries.push(entry);
         dayData.minTemp = Math.min(dayData.minTemp, temp);
         dayData.maxTemp = Math.max(dayData.maxTemp, temp);
@@ -233,17 +231,13 @@ const fetchWeatherData = () => __awaiter(void 0, void 0, void 0, function* () {
         const allTemps = dayData.entries.map((entry) => entry.main.temp);
         dayData.minTemp = Math.min(...allTemps);
         dayData.maxTemp = Math.max(...allTemps);
-        console.log(`Final for ${date} - Min: ${dayData.minTemp}, Max: ${dayData.maxTemp}, Temps: ${allTemps.join(", ")}`);
     });
-    console.log("Daily Data:", Array.from(dailyData.entries()));
     const filteredForecast = Array.from(dailyData.values())
         .slice(0, 5)
         .map(({ entries, minTemp, maxTemp, noonEntry }) => (Object.assign(Object.assign({}, (noonEntry !== null && noonEntry !== void 0 ? noonEntry : entries[0])), { minTemp,
         maxTemp })));
     const filteredWeatherData = Object.assign(Object.assign({}, data), { list: filteredForecast });
     weatherData = data;
-    console.log("weather data:", weatherData);
-    console.log("Filtered Forecast:", filteredForecast);
     loadMainPage(filteredWeatherData);
     updateMainPageStyle();
 });
@@ -273,8 +267,6 @@ const loadMainPage = (data) => {
         let weatherIcon = "";
         const weatherDescription = dayData.weather[0].description.toLowerCase();
         weatherIcon = weatherIcons[weatherDescription] || "./assets/overcast.svg";
-        console.log("weather icon:", weatherIcon);
-        console.log("Day name:", dayName);
         return `
     <div class="main-temp-table-row">
         <div class="main-temp-table-day">${dayName}</div>
