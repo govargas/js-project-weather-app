@@ -122,7 +122,9 @@ const loadWeatherData = (weatherData?: any) => {
       <img id="weather-icon" class="weather-icon" src="" alt="Weather Icon">
     </div>
     <div class="weather-info">  
-      <h1 class="big-temp">${Math.round(weatherData.main.temp)}<sup class="big-temp-degrees">°C</sup></h1>
+      <h1 class="big-temp">${Math.round(
+        weatherData.main.temp
+      )}<sup class="big-temp-degrees">°C</sup></h1>
       <h2>${weatherData.name}</h2>
       <h3>${weatherData.weather[0].description}</h3>
     </div>
@@ -152,9 +154,15 @@ const updatePageStyle = () => {
     minute: "2-digit",
     hour12: false,
   });
-  
-  const sunriseHourStr = getCityTime(weatherData.sys.sunrise, weatherData.timezone);
-  const sunsetHourStr = getCityTime(weatherData.sys.sunset, weatherData.timezone);
+
+  const sunriseHourStr = getCityTime(
+    weatherData.sys.sunrise,
+    weatherData.timezone
+  );
+  const sunsetHourStr = getCityTime(
+    weatherData.sys.sunset,
+    weatherData.timezone
+  );
 
   const currentHour = parseInt(currentHourStr.split(":")[0]);
   const sunriseHour = parseInt(sunriseHourStr.split(":")[0]);
@@ -165,7 +173,9 @@ const updatePageStyle = () => {
   document.body.classList.remove("daytime", "nighttime");
   document.body.classList.add(isDaytime ? "daytime" : "nighttime");
 
-  const timeImages = document.querySelectorAll(".weather-icon") as NodeListOf<HTMLImageElement>;
+  const timeImages = document.querySelectorAll(
+    ".weather-icon"
+  ) as NodeListOf<HTMLImageElement>;
   timeImages.forEach((timeImage) => {
     timeImage.src = isDaytime ? "./assets/sunny-w.svg" : "./assets/night.svg";
     timeImage.alt = isDaytime ? "Sun Icon" : "Moon Icon";
@@ -181,9 +191,15 @@ const updateMainPageStyle = () => {
     minute: "2-digit",
     hour12: false,
   });
-  
-  const sunriseHourStr = getCityTime(weatherData.city.sunrise, weatherData.city.timezone);
-  const sunsetHourStr = getCityTime(weatherData.city.sunset, weatherData.city.timezone);
+
+  const sunriseHourStr = getCityTime(
+    weatherData.city.sunrise,
+    weatherData.city.timezone
+  );
+  const sunsetHourStr = getCityTime(
+    weatherData.city.sunset,
+    weatherData.city.timezone
+  );
 
   const currentHour = parseInt(currentHourStr.split(":")[0]);
   const sunriseHour = parseInt(sunriseHourStr.split(":")[0]);
@@ -224,18 +240,71 @@ const fetchWeatherData = async (): Promise<void> => {
   const response = await fetch(weatherForecastURL);
   const data = await response.json();
 
-  const uniqueDays = new Map();
+  const dailyData = new Map<
+    string,
+    { entries: any[]; minTemp: number; maxTemp: number; noonEntry?: any }
+  >();
+
   data.list.forEach((entry: any) => {
     const date = entry.dt_txt.split(" ")[0];
-    if (!uniqueDays.has(date) || entry.dt_txt.includes("12:00:00")) {
-      uniqueDays.set(date, entry);
+    const temp = entry.main.temp;
+
+    if (!dailyData.has(date)) {
+      dailyData.set(date, {
+        entries: [],
+        minTemp: temp,
+        maxTemp: temp,
+        noonEntry: undefined,
+      });
+    }
+
+    const dayData = dailyData.get(date)!;
+    console.log(
+      `Date: ${date}, Temp: ${temp}, Min: ${dayData.minTemp}, Max: ${dayData.maxTemp}`
+    );
+
+    dayData.entries.push(entry);
+
+    dayData.minTemp = Math.min(dayData.minTemp, temp);
+    dayData.maxTemp = Math.max(dayData.maxTemp, temp);
+
+    if (entry.dt_txt.includes("12:00:00")) {
+      dayData.noonEntry = entry;
     }
   });
-  const filteredForecast = Array.from(uniqueDays.values()).slice(0, 5);
-  const filteredWeatherData = { ...data, list: filteredForecast };
+
+  dailyData.forEach((dayData, date) => {
+    const allTemps = dayData.entries.map((entry) => entry.main.temp);
+
+    dayData.minTemp = Math.min(...allTemps);
+    dayData.maxTemp = Math.max(...allTemps);
+
+    console.log(
+      `Final for ${date} - Min: ${dayData.minTemp}, Max: ${
+        dayData.maxTemp
+      }, Temps: ${allTemps.join(", ")}`
+    );
+  });
+
+  console.log("Daily Data:", Array.from(dailyData.entries()));
+
+  const filteredForecast = Array.from(dailyData.values())
+    .slice(0, 5)
+    .map(({ entries, minTemp, maxTemp, noonEntry }) => ({
+      ...(noonEntry ?? entries[0]),
+      minTemp,
+      maxTemp,
+    }));
+
+  const filteredWeatherData = {
+    ...data,
+    list: filteredForecast,
+  };
 
   weatherData = data;
   console.log("weather data:", weatherData);
+  console.log("Filtered Forecast:", filteredForecast);
+
   loadMainPage(filteredWeatherData);
   updateMainPageStyle();
 };
@@ -248,10 +317,10 @@ const weatherIcons: Record<string, string> = {
   "broken clouds": "./assets/partly-cloudy.svg",
   "shower rain": "./assets/overcast.svg",
   "overcast clouds": "./assets/overcast.svg",
-  "rain": "./assets/overcast.svg",
-  "thunderstorm": "./assets/overcast.svg",
-  "snow": "./assets/overcast.svg",
-  "mist": "./assets/overcast.svg"
+  rain: "./assets/overcast.svg",
+  thunderstorm: "./assets/overcast.svg",
+  snow: "./assets/overcast.svg",
+  mist: "./assets/overcast.svg",
 };
 
 const loadMainPage = (data: any) => {
@@ -262,8 +331,8 @@ const loadMainPage = (data: any) => {
     .map((dayData: any) => {
       const dayDate = new Date(dayData.dt * 1000);
       const dayName = days[dayDate.getDay()];
-      const minTemp = Math.round(dayData.main.temp_min);
-      const maxTemp = Math.round(dayData.main.temp_max);
+      const minTemp = Math.round(dayData.minTemp);
+      const maxTemp = Math.round(dayData.maxTemp);
       let weatherIcon: string = "";
       const weatherDescription = dayData.weather[0].description.toLowerCase();
       weatherIcon = weatherIcons[weatherDescription] || "./assets/overcast.svg";
@@ -273,7 +342,7 @@ const loadMainPage = (data: any) => {
     <div class="main-temp-table-row">
         <div class="main-temp-table-day">${dayName}</div>
         <div><img class="main-temp-table-img" src="${weatherIcon}" alt="${dayData.weather[0].description}"></div>
-        <div class="main-temp-table-temp">${minTemp} / ${maxTemp}°C</div>
+        <div class="main-temp-table-temp">${minTemp} °C / ${maxTemp}°C</div>
       </div>
     `;
     })
@@ -285,7 +354,9 @@ const loadMainPage = (data: any) => {
       <img id="weather-icon" class="weather-icon" src="" alt="Weather Icon">
       </div>
           <div class="weather-info"> 
-          <h1 class="big-temp">${Math.round(data.list[0].main.temp)}<sup class="big-temp-degrees">°C</sup></h1>
+          <h1 class="big-temp">${Math.round(
+            data.list[0].main.temp
+          )}<sup class="big-temp-degrees">°C</sup></h1>
           <h2>${data.city.name}</h2>
           <h3>${data.list[0].weather[0].main}</h3>
           </div>
