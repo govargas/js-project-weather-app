@@ -103,7 +103,6 @@ const oneDayWeatherFetch = () => __awaiter(void 0, void 0, void 0, function* () 
     try {
         const response = yield fetch(oneWeatherURL);
         const data = yield response.json();
-        console.log(data);
         weatherData = data;
         loadWeatherData(weatherData);
         // fetchWeatherData(); //REMOVE THIS WHEN FINISHED
@@ -208,17 +207,37 @@ document.addEventListener("click", (event) => {
 const fetchWeatherData = () => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield fetch(weatherForecastURL);
     const data = yield response.json();
-    const uniqueDays = new Map();
+    const dailyData = new Map();
     data.list.forEach((entry) => {
         const date = entry.dt_txt.split(" ")[0];
-        if (!uniqueDays.has(date) || entry.dt_txt.includes("12:00:00")) {
-            uniqueDays.set(date, entry);
+        const temp = entry.main.temp;
+        if (!dailyData.has(date)) {
+            dailyData.set(date, {
+                entries: [],
+                minTemp: temp,
+                maxTemp: temp,
+                noonEntry: undefined,
+            });
+        }
+        const dayData = dailyData.get(date);
+        dayData.entries.push(entry);
+        dayData.minTemp = Math.min(dayData.minTemp, temp);
+        dayData.maxTemp = Math.max(dayData.maxTemp, temp);
+        if (entry.dt_txt.includes("12:00:00")) {
+            dayData.noonEntry = entry;
         }
     });
-    const filteredForecast = Array.from(uniqueDays.values()).slice(0, 5);
+    dailyData.forEach((dayData, date) => {
+        const allTemps = dayData.entries.map((entry) => entry.main.temp);
+        dayData.minTemp = Math.min(...allTemps);
+        dayData.maxTemp = Math.max(...allTemps);
+    });
+    const filteredForecast = Array.from(dailyData.values())
+        .slice(0, 5)
+        .map(({ entries, minTemp, maxTemp, noonEntry }) => (Object.assign(Object.assign({}, (noonEntry !== null && noonEntry !== void 0 ? noonEntry : entries[0])), { minTemp,
+        maxTemp })));
     const filteredWeatherData = Object.assign(Object.assign({}, data), { list: filteredForecast });
     weatherData = data;
-    console.log("weather data:", weatherData);
     loadMainPage(filteredWeatherData);
     updateMainPageStyle();
 });
@@ -230,10 +249,10 @@ const weatherIcons = {
     "broken clouds": "./assets/partly-cloudy.svg",
     "shower rain": "./assets/overcast.svg",
     "overcast clouds": "./assets/overcast.svg",
-    "rain": "./assets/overcast.svg",
-    "thunderstorm": "./assets/overcast.svg",
-    "snow": "./assets/overcast.svg",
-    "mist": "./assets/overcast.svg"
+    rain: "./assets/overcast.svg",
+    thunderstorm: "./assets/overcast.svg",
+    snow: "./assets/overcast.svg",
+    mist: "./assets/overcast.svg",
 };
 const loadMainPage = (data) => {
     const sunriseTime = getCityTime(data.city.sunrise, data.city.timezone);
@@ -243,18 +262,16 @@ const loadMainPage = (data) => {
         .map((dayData) => {
         const dayDate = new Date(dayData.dt * 1000);
         const dayName = days[dayDate.getDay()];
-        const minTemp = Math.round(dayData.main.temp_min);
-        const maxTemp = Math.round(dayData.main.temp_max);
+        const minTemp = Math.round(dayData.minTemp);
+        const maxTemp = Math.round(dayData.maxTemp);
         let weatherIcon = "";
         const weatherDescription = dayData.weather[0].description.toLowerCase();
         weatherIcon = weatherIcons[weatherDescription] || "./assets/overcast.svg";
-        console.log("weather icon:", weatherIcon);
-        console.log("Day name:", dayName);
         return `
     <div class="main-temp-table-row">
         <div class="main-temp-table-day">${dayName}</div>
         <div><img class="main-temp-table-img" src="${weatherIcon}" alt="${dayData.weather[0].description}"></div>
-        <div class="main-temp-table-temp">${minTemp} / ${maxTemp}°C</div>
+        <div class="main-temp-table-temp">${minTemp} °C / ${maxTemp}°C</div>
       </div>
     `;
     })
